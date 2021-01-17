@@ -1,5 +1,8 @@
 import React, { useReducer, useState } from "react";
 import "./styles.css";
+import { InputTodos } from "./components/inputTodos";
+import { IncompleteTodos } from "./components/incompleteTodos";
+import { CompleteTodos, completeTodos } from "./components/completeTodos";
 
 export const App = () => {
   const [todoText, setTodoText] = useState("");
@@ -53,44 +56,26 @@ export const App = () => {
 
   return (
     <>
-      <div className="input-area">
-        <input
-          placeholder="TODOを入力"
-          value={todoText}
-          onChange={onChangeTodoText}
-        />
-        <button onClick={onClickAdd}>追加</button>
-      </div>
-      <div className="incomplete-area">
-        <p className="title">未完了のTODO</p>
-        <ul>
-          {/* stateに定義したアロー関数をmapで分割して取り出し、
-          map等でレンダリングする際はkeyを定義する*/}
-          {incompleteTodos.map((todo, index) => {
-            return (
-              <div key={todo} className="list-row">
-                <li>{todo}</li>
-                <button onClick={() => onClickComplete(index)}>完了</button>
-                {/* 引数を定義する場合はアロー関数を宣言する */}
-                <button onClick={() => onClickDelete(index)}>削除</button>
-              </div>
-            );
-          })}
-        </ul>
-      </div>
-      <div className="complete-area">
-        <p className="title">未完了のTODO</p>
-        <ul>
-          {completeTodos.map((todo, index) => {
-            return (
-              <div key={todo} className="list-row">
-                <li>{todo}</li>
-                <button onClick={() => onClickBack(index)}>戻す</button>
-              </div>
-            );
-          })}
-        </ul>
-      </div>
+      {/* コンポーネント化して、propsを渡す */}
+      <InputTodos
+        todoText={todoText}
+        onChange={onChangeTodoText}
+        onClick={onClickAdd}
+        //5を超えた時点でtrueが渡る
+        disabled={incompleteTodos.length >= 5}
+      />
+      {/* Todoが５個以上の場合だけ右辺が実行 */}
+      {incompleteTodos.length >= 5 && (
+        <p style={{ color: "red", textAlign: "center" }}>
+          登録できるtodo5個までだよ～。消化しよう!
+        </p>
+      )}
+      <IncompleteTodos
+        todos={incompleteTodos}
+        onClickComplete={onClickComplete}
+        onClickDelete={onClickDelete}
+      />
+      <CompleteTodos todos={completeTodos} onClickBack={onClickBack} />
     </>
   );
 };
